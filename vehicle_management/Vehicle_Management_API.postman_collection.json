@@ -1,0 +1,487 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789012",
+		"name": "Vehicle Management API",
+		"description": "Complete API collection for Vehicle Management System with CRUD operations, authentication, wishlist, and gallery features",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "API Root",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						}
+					}
+				},
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('auth_token', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"testpass123\",\n    \"password_confirm\": \"testpass123\",\n    \"first_name\": \"Test\",\n    \"last_name\": \"User\",\n    \"phone\": \"+1234567890\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register", ""]
+						}
+					}
+				},
+				{
+					"name": "Register Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('admin_token', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"email\": \"admin@example.com\",\n    \"password\": \"adminpass123\",\n    \"password_confirm\": \"adminpass123\",\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"phone\": \"+1234567891\",\n    \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register", ""]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('auth_token', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"adminpass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/profile/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "profile", ""]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout/",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Vehicles",
+			"item": [
+				{
+					"name": "List Vehicles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", ""]
+						}
+					}
+				},
+				{
+					"name": "List Vehicles with Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/?search=Mercedes&fuel_type=hybrid_electric&min_price=10000&max_price=20000",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", ""],
+							"query": [
+								{
+									"key": "search",
+									"value": "Mercedes"
+								},
+								{
+									"key": "fuel_type",
+									"value": "hybrid_electric"
+								},
+								{
+									"key": "min_price",
+									"value": "10000"
+								},
+								{
+									"key": "max_price",
+									"value": "20000"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Vehicle (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('vehicle_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Mercedes Benz E350e\",\n    \"year\": 2017,\n    \"price\": 14000,\n    \"fuel_type\": \"hybrid_electric\",\n    \"transmission\": \"automatic\",\n    \"mileage\": \"60,000 miles\",\n    \"body_type\": \"saloon\",\n    \"color\": \"Black\",\n    \"engine\": \"2.0L Hybrid\",\n    \"description\": \"Mercedes Benz E350e 2017 Hybrid Electric. Excellent condition with navigation system.\",\n    \"features\": [\n        \"Clean Hybrid Electric\",\n        \"Excellent Condition\",\n        \"Navigation System\",\n        \"Leather Seats\",\n        \"Sunroof\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/vehicles/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Vehicle Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/{{vehicle_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "{{vehicle_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Vehicle (Admin/Owner Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Mercedes Benz E350e Updated\",\n    \"year\": 2017,\n    \"price\": 13500,\n    \"fuel_type\": \"hybrid_electric\",\n    \"transmission\": \"automatic\",\n    \"mileage\": \"60,000 miles\",\n    \"body_type\": \"saloon\",\n    \"color\": \"Black\",\n    \"engine\": \"2.0L Hybrid\",\n    \"description\": \"Mercedes Benz E350e 2017 Hybrid Electric. Price reduced!\",\n    \"features\": [\n        \"Clean Hybrid Electric\",\n        \"Excellent Condition\",\n        \"Navigation System\",\n        \"Leather Seats\",\n        \"Sunroof\",\n        \"Premium Sound System\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/vehicles/{{vehicle_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "{{vehicle_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Vehicle (Admin/Owner Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/{{vehicle_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "{{vehicle_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Vehicle Images",
+			"item": [
+				{
+					"name": "Upload Vehicle Image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "is_primary",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vehicles/{{vehicle_id}}/images/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "{{vehicle_id}}", "images", ""]
+						}
+					}
+				},
+				{
+					"name": "List Vehicle Images",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/{{vehicle_id}}/images/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "{{vehicle_id}}", "images", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Vehicle Image",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/{{vehicle_id}}/images/1/delete/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "{{vehicle_id}}", "images", "1", "delete", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Gallery",
+			"item": [
+				{
+					"name": "Get Gallery Images",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/gallery/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "gallery", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Limited Gallery Images",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/gallery/?limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "gallery", ""],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Wishlist",
+			"item": [
+				{
+					"name": "Get User Wishlist",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/wishlist/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "wishlist", ""]
+						}
+					}
+				},
+				{
+					"name": "Add to Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vehicle_id\": {{vehicle_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/vehicles/wishlist/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "wishlist", ""]
+						}
+					}
+				},
+				{
+					"name": "Toggle Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/{{vehicle_id}}/wishlist/toggle/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "{{vehicle_id}}", "wishlist", "toggle", ""]
+						}
+					}
+				},
+				{
+					"name": "Remove from Wishlist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/{{vehicle_id}}/wishlist/remove/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "{{vehicle_id}}", "wishlist", "remove", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Vehicle Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/stats/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "stats", ""]
+						}
+					}
+				}
+			]
+		}
+	]
+} 

@@ -1,0 +1,5 @@
+vehicle_app_env/
+venv/
+.env
+.pyc
+__pycache__/
