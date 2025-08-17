@@ -8,8 +8,9 @@ urlpatterns = [
     path('', views.VehicleListCreateView.as_view(), name='vehicle-list-create'),
     path('<int:pk>/', views.VehicleDetailView.as_view(), name='vehicle-detail'),
     
-    # Gallery
+    # Gallery (standalone images, not attached to vehicles)
     path('gallery/', views.GalleryView.as_view(), name='gallery'),
+    path('gallery/<int:pk>/', views.GalleryDetailView.as_view(), name='gallery-detail'),
     
     # Wishlist operations
     path('wishlist/', views.WishlistView.as_view(), name='wishlist'),

@@ -39,10 +39,14 @@ def api_root(request):
             'vehicles': {
                 'list_create': '/api/v1/vehicles/',
                 'detail': '/api/v1/vehicles/{id}/',
-                'gallery': '/api/v1/vehicles/gallery/',
                 'wishlist': '/api/v1/vehicles/wishlist/',
                 'toggle_wishlist': '/api/v1/vehicles/{id}/wishlist/toggle/',
                 'stats': '/api/v1/vehicles/stats/',
+            },
+            'gallery': {
+                'list_create': '/api/v1/vehicles/gallery/',
+                'detail': '/api/v1/vehicles/gallery/{id}/',
+                'description': 'Standalone gallery images (not attached to vehicles)',
             }
         }
     })

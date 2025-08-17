@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Vehicle, VehicleImage, Wishlist
+from .models import Vehicle, VehicleImage, Wishlist, Gallery
 
 class VehicleImageInline(admin.TabularInline):
     model = VehicleImage
@@ -49,3 +49,26 @@ class WishlistAdmin(admin.ModelAdmin):
     list_filter = ('added_at',)
     search_fields = ('user__username', 'vehicle__title')
     ordering = ('-added_at',)
+
+@admin.register(Gallery)
+class GalleryAdmin(admin.ModelAdmin):
+    list_display = ('title', 'uploaded_by', 'uploaded_at', 'is_active')
+    list_filter = ('is_active', 'uploaded_at', 'uploaded_by')
+    search_fields = ('title', 'description')
+    ordering = ('-uploaded_at',)
+    
+    fieldsets = (
+        ('Image Information', {
+            'fields': ('title', 'description', 'image')
+        }),
+        ('Status', {
+            'fields': ('is_active', 'uploaded_by')
+        }),
+    )
+    
+    readonly_fields = ('uploaded_by',)
+    
+    def save_model(self, request, obj, form, change):
+        if not change:  # If creating new object
+            obj.uploaded_by = request.user
+        super().save_model(request, obj, form, change)

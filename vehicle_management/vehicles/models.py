@@ -84,3 +84,19 @@ class Wishlist(models.Model):
         
     def __str__(self):
         return f"{self.user.username} - {self.vehicle.title}"
+
+class Gallery(models.Model):
+    title = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    image = CloudinaryField('image')
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gallery_images')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['-uploaded_at']
+        verbose_name = 'Gallery Image'
+        verbose_name_plural = 'Gallery Images'
+        
+    def __str__(self):
+        return f"Gallery Image: {self.title or 'Untitled'} - {self.uploaded_at.strftime('%Y-%m-%d')}"

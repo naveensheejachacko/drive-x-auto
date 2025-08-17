@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Vehicle, VehicleImage, Wishlist
+from .models import Vehicle, VehicleImage, Wishlist, Gallery
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -125,18 +125,23 @@ class WishlistSerializer(serializers.ModelSerializer):
         validated_data['user'] = request.user
         return super().create(validated_data)
 
-class GalleryImageSerializer(serializers.ModelSerializer):
-    """Serializer for gallery view showing random vehicle images"""
+class GallerySerializer(serializers.ModelSerializer):
+    """Serializer for standalone gallery images (not attached to vehicles)"""
     image_url = serializers.SerializerMethodField()
-    vehicle_title = serializers.CharField(source='vehicle.title', read_only=True)
-    vehicle_year = serializers.IntegerField(source='vehicle.year', read_only=True)
-    vehicle_price = serializers.DecimalField(source='vehicle.price', max_digits=10, decimal_places=2, read_only=True)
+    uploaded_by_username = serializers.CharField(source='uploaded_by.username', read_only=True)
     
     class Meta:
-        model = VehicleImage
-        fields = ['id', 'image_url', 'vehicle_title', 'vehicle_year', 'vehicle_price', 'uploaded_at']
+        model = Gallery
+        fields = ['id', 'title', 'description', 'image', 'image_url', 'uploaded_by', 'uploaded_by_username', 'uploaded_at', 'is_active']
+        read_only_fields = ['id', 'uploaded_by', 'uploaded_at', 'is_active']
     
     def get_image_url(self, obj):
         if obj.image:
             return obj.image.url
-        return None 
+        return None
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['uploaded_by'] = request.user
+        validated_data['is_active'] = True
+        return super().create(validated_data) 

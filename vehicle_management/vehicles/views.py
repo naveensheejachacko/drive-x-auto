@@ -3,10 +3,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from .models import Vehicle, VehicleImage, Wishlist
+from .models import Vehicle, VehicleImage, Wishlist, Gallery
 from .serializers import (
     VehicleSerializer, VehicleListSerializer, VehicleImageSerializer,
-    WishlistSerializer, GalleryImageSerializer
+    WishlistSerializer, GallerySerializer
 )
 from .permissions import IsAdminOrReadOnly, IsOwnerOrAdminOrReadOnly
 import random
@@ -85,16 +85,18 @@ class VehicleDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance.save()
         return Response({'message': 'Vehicle deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
-class GalleryView(generics.ListAPIView):
+class GalleryView(generics.ListCreateAPIView):
     """
-    Gallery view showing random vehicle images for feed
+    Gallery view for standalone images (not attached to vehicles)
+    - GET: List random gallery images
+    - POST: Upload new gallery image (admin only)
     """
-    serializer_class = GalleryImageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = GallerySerializer
+    permission_classes = [IsAdminOrReadOnly]
     
     def get_queryset(self):
-        # Get random vehicle images
-        images = list(VehicleImage.objects.filter(vehicle__is_active=True))
+        # Get random gallery images
+        images = list(Gallery.objects.filter(is_active=True))
         random.shuffle(images)
         
         # Limit to 50 random images for performance
@@ -193,6 +195,21 @@ def delete_vehicle_image(request, vehicle_id, image_id):
     except VehicleImage.DoesNotExist:
         return Response({'error': 'Image not found'}, status=status.HTTP_404_NOT_FOUND)
 
+class GalleryDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a gallery image (admin only)
+    """
+    queryset = Gallery.objects.filter(is_active=True)
+    serializer_class = GallerySerializer
+    permission_classes = [IsAdminOrReadOnly]
+    
+    def destroy(self, request, *args, **kwargs):
+        # Soft delete
+        instance = self.get_object()
+        instance.is_active = False
+        instance.save()
+        return Response({'message': 'Gallery image deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def vehicle_stats(request):
@@ -204,10 +221,12 @@ def vehicle_stats(request):
     
     total_vehicles = Vehicle.objects.filter(is_active=True).count()
     total_wishlists = Wishlist.objects.count()
-    total_images = VehicleImage.objects.count()
+    total_vehicle_images = VehicleImage.objects.count()
+    total_gallery_images = Gallery.objects.filter(is_active=True).count()
     
     return Response({
         'total_vehicles': total_vehicles,
         'total_wishlists': total_wishlists,
-        'total_images': total_images,
+        'total_vehicle_images': total_vehicle_images,
+        'total_gallery_images': total_gallery_images,
     })

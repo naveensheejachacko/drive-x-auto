@@ -471,7 +471,7 @@
 			]
 		},
 		{
-			"name": "Gallery",
+			"name": "Gallery (Standalone Images)",
 			"item": [
 				{
 					"name": "Get Gallery Images",
@@ -500,6 +500,89 @@
 									"value": "20"
 								}
 							]
+						}
+					}
+				},
+				{
+					"name": "Upload Gallery Image (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Beautiful Car Scene",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Random car image for gallery feed",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vehicles/gallery/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "gallery", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Gallery Image Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/gallery/1/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "gallery", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Gallery Image (Admin Only)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Updated Gallery Image",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Updated description for gallery image",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vehicles/gallery/1/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "gallery", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Gallery Image (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/vehicles/gallery/1/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", "gallery", "1", ""]
 						}
 					}
 				}
