@@ -36,7 +36,7 @@ class VehicleSerializer(serializers.ModelSerializer):
             'created_by', 'created_by_username', 'created_at', 'updated_at',
             'is_active'
         ]
-        read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_by', 'created_at', 'updated_at', 'is_active']
     
     def get_is_wishlisted(self, obj):
         request = self.context.get('request')
@@ -48,6 +48,9 @@ class VehicleSerializer(serializers.ModelSerializer):
         uploaded_images = validated_data.pop('uploaded_images', [])
         request = self.context.get('request')
         validated_data['created_by'] = request.user
+        
+        # Ensure is_active is always True for new vehicles
+        validated_data['is_active'] = True
         
         vehicle = Vehicle.objects.create(**validated_data)
         
