@@ -267,6 +267,107 @@
 					}
 				},
 				{
+					"name": "Create Vehicle with Images (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('vehicle_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "BMW X5 with Images",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2020",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "25000",
+									"type": "text"
+								},
+								{
+									"key": "fuel_type",
+									"value": "petrol",
+									"type": "text"
+								},
+								{
+									"key": "transmission",
+									"value": "automatic",
+									"type": "text"
+								},
+								{
+									"key": "mileage",
+									"value": "45,000 miles",
+									"type": "text"
+								},
+								{
+									"key": "body_type",
+									"value": "suv",
+									"type": "text"
+								},
+								{
+									"key": "color",
+									"value": "White",
+									"type": "text"
+								},
+								{
+									"key": "engine",
+									"value": "3.0L Turbocharged",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "BMW X5 2020 in excellent condition with premium features",
+									"type": "text"
+								},
+								{
+									"key": "features",
+									"value": "[\"Premium Package\", \"Navigation\", \"Leather Seats\", \"Sunroof\", \"Heated Seats\"]",
+									"type": "text"
+								},
+								{
+									"key": "uploaded_images",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "uploaded_images",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "uploaded_images",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vehicles/",
+							"host": ["{{base_url}}"],
+							"path": ["vehicles", ""]
+						}
+					}
+				},
+				{
 					"name": "Get Vehicle Details",
 					"request": {
 						"method": "GET",
