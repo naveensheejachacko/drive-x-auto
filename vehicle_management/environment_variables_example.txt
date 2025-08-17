@@ -1,0 +1,21 @@
+# Environment Variables for Render Deployment
+
+# Django Configuration
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+ALLOWED_HOSTS=localhost,127.0.0.1,your-app-name.onrender.com
+
+# Database Configuration (Render will provide DATABASE_URL automatically)
+DATABASE_URL=postgresql://user:password@host:port/database
+
+# Alternative database configuration (if not using DATABASE_URL)
+DB_NAME=vehicle_management
+DB_USER=postgres
+DB_PASSWORD=your-db-password
+DB_HOST=localhost
+DB_PORT=5432
+
+# Cloudinary Configuration (for image uploads)
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret 

@@ -28,8 +28,8 @@ A comprehensive Django REST API for vehicle management with role-based access co
 ```bash
 git clone <repository-url>
 cd vehicle_management
-python3 -m venv vehicle_app_env
-source vehicle_app_env/bin/activate  # On Windows: vehicle_app_env\Scripts\activate
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 ### 2. Install Dependencies
