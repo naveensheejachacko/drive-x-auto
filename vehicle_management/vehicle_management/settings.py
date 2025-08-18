@@ -31,7 +31,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-)kzy*85*60sfey1zipx(a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['*']
 
 # Add render.com domains
 if not DEBUG:
@@ -168,20 +168,8 @@ REST_FRAMEWORK = {
 }
 
 # CORS Configuration
-if DEBUG:
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8080",
-    ]
-    CORS_ALLOW_ALL_ORIGINS = True  # Only for development
-else:
-    # Production CORS settings - add your frontend domains here
-    CORS_ALLOWED_ORIGINS = [
-        # Add your frontend domain here, e.g.:
-        # "https://your-frontend-app.onrender.com",
-    ]
-    CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True  # Only for development
+
 
 # Cloudinary Configuration
 cloudinary.config(
