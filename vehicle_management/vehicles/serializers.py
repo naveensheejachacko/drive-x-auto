@@ -93,7 +93,7 @@ class VehicleListSerializer(serializers.ModelSerializer):
         model = Vehicle
         fields = [
             'id', 'title', 'year', 'price', 'fuel_type', 'transmission',
-            'mileage', 'body_type', 'color', 'primary_image', 'is_wishlisted',
+            'mileage', 'body_type', 'color', 'description', 'primary_image', 'is_wishlisted',
             'created_by_username', 'created_at'
         ]
     
