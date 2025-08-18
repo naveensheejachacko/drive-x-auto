@@ -34,7 +34,7 @@ def login_view(request):
         
         return Response({
             'user': UserSerializer(user).data,
-            'token': token.key,
+            'token': 'Token ' + token.key,
             'message': 'Login successful'
         }, status=status.HTTP_200_OK)
     
