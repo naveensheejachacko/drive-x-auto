@@ -3,20 +3,20 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from .models import Vehicle, VehicleImage, Wishlist, Gallery
+from .models import Vehicle, VehicleImage, Gallery
 from .serializers import (
     VehicleSerializer, VehicleListSerializer, VehicleImageSerializer,
-    WishlistSerializer, GallerySerializer
+    GallerySerializer
 )
-from .permissions import IsAdminOrReadOnly, IsOwnerOrAdminOrReadOnly
+from .permissions import IsAuthenticatedOrReadOnly, IsOwnerOrAuthenticated
 import random
 
 class VehicleListCreateView(generics.ListCreateAPIView):
     """
-    List all vehicles or create a new vehicle (admin only)
+    List all vehicles or create a new vehicle
     """
     queryset = Vehicle.objects.filter(is_active=True)
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -72,11 +72,11 @@ class VehicleListCreateView(generics.ListCreateAPIView):
 
 class VehicleDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve, update or delete a vehicle (update/delete: owner or admin only)
+    Retrieve, update or delete a vehicle (update/delete: owner only)
     """
     queryset = Vehicle.objects.filter(is_active=True)
     serializer_class = VehicleSerializer
-    permission_classes = [IsOwnerOrAdminOrReadOnly]
+    permission_classes = [IsOwnerOrAuthenticated]
     
     def destroy(self, request, *args, **kwargs):
         # Soft delete
@@ -92,7 +92,12 @@ class GalleryView(generics.ListCreateAPIView):
     - POST: Upload new gallery image (admin only)
     """
     serializer_class = GallerySerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
     
     def get_queryset(self):
         # Get random gallery images
@@ -103,63 +108,14 @@ class GalleryView(generics.ListCreateAPIView):
         limit = int(self.request.query_params.get('limit', 50))
         return images[:limit]
 
-class WishlistView(generics.ListCreateAPIView):
-    """
-    List user's wishlist or add vehicle to wishlist
-    """
-    serializer_class = WishlistSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        return Wishlist.objects.filter(user=self.request.user)
 
-@api_view(['DELETE'])
-@permission_classes([permissions.IsAuthenticated])
-def remove_from_wishlist(request, vehicle_id):
-    """
-    Remove vehicle from user's wishlist
-    """
-    try:
-        wishlist_item = Wishlist.objects.get(user=request.user, vehicle_id=vehicle_id)
-        wishlist_item.delete()
-        return Response({'message': 'Vehicle removed from wishlist'}, status=status.HTTP_204_NO_CONTENT)
-    except Wishlist.DoesNotExist:
-        return Response({'error': 'Vehicle not in wishlist'}, status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def toggle_wishlist(request, vehicle_id):
-    """
-    Toggle vehicle in user's wishlist
-    """
-    try:
-        vehicle = get_object_or_404(Vehicle, id=vehicle_id, is_active=True)
-        wishlist_item, created = Wishlist.objects.get_or_create(
-            user=request.user,
-            vehicle=vehicle
-        )
-        
-        if created:
-            return Response({
-                'message': 'Vehicle added to wishlist',
-                'is_wishlisted': True
-            }, status=status.HTTP_201_CREATED)
-        else:
-            wishlist_item.delete()
-            return Response({
-                'message': 'Vehicle removed from wishlist',
-                'is_wishlisted': False
-            }, status=status.HTTP_200_OK)
-    
-    except Vehicle.DoesNotExist:
-        return Response({'error': 'Vehicle not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class VehicleImageView(generics.ListCreateAPIView):
     """
     List or add images for a specific vehicle
     """
     serializer_class = VehicleImageSerializer
-    permission_classes = [IsOwnerOrAdminOrReadOnly]
+    permission_classes = [IsOwnerOrAuthenticated]
     
     def get_queryset(self):
         vehicle_id = self.kwargs['vehicle_id']
@@ -176,7 +132,7 @@ class VehicleImageView(generics.ListCreateAPIView):
         serializer.save(vehicle=vehicle)
 
 @api_view(['DELETE'])
-@permission_classes([IsOwnerOrAdminOrReadOnly])
+@permission_classes([IsOwnerOrAuthenticated])
 def delete_vehicle_image(request, vehicle_id, image_id):
     """
     Delete a specific vehicle image
@@ -186,7 +142,7 @@ def delete_vehicle_image(request, vehicle_id, image_id):
         vehicle = image.vehicle
         
         # Check permissions
-        if vehicle.created_by != request.user and not request.user.is_admin:
+        if vehicle.created_by != request.user:
             return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
         
         image.delete()
@@ -201,7 +157,12 @@ class GalleryDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Gallery.objects.filter(is_active=True)
     serializer_class = GallerySerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
     
     def destroy(self, request, *args, **kwargs):
         # Soft delete
@@ -214,19 +175,14 @@ class GalleryDetailView(generics.RetrieveUpdateDestroyAPIView):
 @permission_classes([permissions.IsAuthenticated])
 def vehicle_stats(request):
     """
-    Get vehicle statistics (admin only)
+    Get vehicle statistics
     """
-    if not request.user.is_admin:
-        return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
-    
     total_vehicles = Vehicle.objects.filter(is_active=True).count()
-    total_wishlists = Wishlist.objects.count()
     total_vehicle_images = VehicleImage.objects.count()
     total_gallery_images = Gallery.objects.filter(is_active=True).count()
     
     return Response({
         'total_vehicles': total_vehicles,
-        'total_wishlists': total_wishlists,
         'total_vehicle_images': total_vehicle_images,
         'total_gallery_images': total_gallery_images,
     })

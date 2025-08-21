@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Vehicle, VehicleImage, Wishlist, Gallery
+from .models import Vehicle, VehicleImage, Gallery
 
 class VehicleImageInline(admin.TabularInline):
     model = VehicleImage
@@ -43,12 +43,6 @@ class VehicleImageAdmin(admin.ModelAdmin):
     search_fields = ('vehicle__title',)
     ordering = ('-uploaded_at',)
 
-@admin.register(Wishlist)
-class WishlistAdmin(admin.ModelAdmin):
-    list_display = ('user', 'vehicle', 'added_at')
-    list_filter = ('added_at',)
-    search_fields = ('user__username', 'vehicle__title')
-    ordering = ('-added_at',)
 
 @admin.register(Gallery)
 class GalleryAdmin(admin.ModelAdmin):

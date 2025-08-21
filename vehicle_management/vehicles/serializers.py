@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Vehicle, VehicleImage, Wishlist, Gallery
+from .models import Vehicle, VehicleImage, Gallery
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -24,7 +24,6 @@ class VehicleSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    is_wishlisted = serializers.SerializerMethodField()
     created_by_username = serializers.CharField(source='created_by.username', read_only=True)
     
     class Meta:
@@ -32,17 +31,11 @@ class VehicleSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'year', 'price', 'fuel_type', 'transmission',
             'mileage', 'body_type', 'color', 'engine', 'description',
-            'features', 'images', 'uploaded_images', 'is_wishlisted',
+            'features', 'images', 'uploaded_images',
             'created_by', 'created_by_username', 'created_at', 'updated_at',
             'is_active'
         ]
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at', 'is_active']
-    
-    def get_is_wishlisted(self, obj):
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return Wishlist.objects.filter(user=request.user, vehicle=obj).exists()
-        return False
     
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
@@ -86,14 +79,13 @@ class VehicleSerializer(serializers.ModelSerializer):
 class VehicleListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for listing vehicles"""
     primary_image = serializers.SerializerMethodField()
-    is_wishlisted = serializers.SerializerMethodField()
     created_by_username = serializers.CharField(source='created_by.username', read_only=True)
     
     class Meta:
         model = Vehicle
         fields = [
             'id', 'title', 'year', 'price', 'fuel_type', 'transmission',
-            'mileage', 'body_type', 'color', 'description', 'primary_image', 'is_wishlisted',
+            'mileage', 'body_type', 'color', 'description', 'primary_image',
             'created_by_username', 'created_at'
         ]
     
@@ -105,26 +97,6 @@ class VehicleListSerializer(serializers.ModelSerializer):
             return obj.images.first().image.url
         return None
     
-    def get_is_wishlisted(self, obj):
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return Wishlist.objects.filter(user=request.user, vehicle=obj).exists()
-        return False
-
-class WishlistSerializer(serializers.ModelSerializer):
-    vehicle = VehicleListSerializer(read_only=True)
-    vehicle_id = serializers.IntegerField(write_only=True)
-    
-    class Meta:
-        model = Wishlist
-        fields = ['id', 'vehicle', 'vehicle_id', 'added_at']
-        read_only_fields = ['id', 'added_at']
-    
-    def create(self, validated_data):
-        request = self.context.get('request')
-        validated_data['user'] = request.user
-        return super().create(validated_data)
-
 class GallerySerializer(serializers.ModelSerializer):
     """Serializer for standalone gallery images (not attached to vehicles)"""
     image_url = serializers.SerializerMethodField()

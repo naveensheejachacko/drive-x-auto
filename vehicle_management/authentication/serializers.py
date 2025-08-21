@@ -9,7 +9,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'password_confirm', 'first_name', 'last_name', 'phone', 'role')
+        fields = ('username', 'email', 'password', 'password_confirm', 'first_name', 'last_name', 'phone')
         
     def validate(self, attrs):
         if attrs['password'] != attrs['password_confirm']:
@@ -18,6 +18,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         validated_data.pop('password_confirm')
+        # Force regular user role
+        validated_data['role'] = 'user'
         user = User.objects.create_user(**validated_data)
         return user
 
