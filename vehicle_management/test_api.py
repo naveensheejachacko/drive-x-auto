@@ -9,24 +9,13 @@ import json
 
 # Configuration
 BASE_URL = "http://localhost:8000/api/v1"
-ADMIN_USER = {
-    "username": "admin_test",
-    "email": "admin@test.com",
-    "password": "adminpass123",
-    "password_confirm": "adminpass123",
-    "first_name": "Admin",
-    "last_name": "Test",
-    "role": "admin"
-}
-
-REGULAR_USER = {
+USER = {
     "username": "user_test",
     "email": "user@test.com",
     "password": "userpass123",
     "password_confirm": "userpass123",
     "first_name": "User",
-    "last_name": "Test",
-    "role": "user"
+    "last_name": "Test"
 }
 
 SAMPLE_VEHICLE = {
@@ -60,36 +49,23 @@ def test_api():
         print(f"❌ API Root failed: {response.status_code}")
         return
     
-    # Test 2: Register Admin User
-    print("\n2. Registering Admin User...")
+    # Test 2: Register User
+    print("\n2. Registering User...")
     response = requests.post(f"{BASE_URL}/auth/register/", 
-                           json=ADMIN_USER,
-                           headers={"Content-Type": "application/json"})
-    if response.status_code == 201:
-        admin_token = response.json()['token']
-        print("✅ Admin user registered successfully")
-    else:
-        print(f"❌ Admin registration failed: {response.status_code}")
-        print(f"   Error: {response.text}")
-        return
-    
-    # Test 3: Register Regular User
-    print("\n3. Registering Regular User...")
-    response = requests.post(f"{BASE_URL}/auth/register/", 
-                           json=REGULAR_USER,
+                           json=USER,
                            headers={"Content-Type": "application/json"})
     if response.status_code == 201:
         user_token = response.json()['token']
-        print("✅ Regular user registered successfully")
+        print("✅ User registered successfully")
     else:
         print(f"❌ User registration failed: {response.status_code}")
         print(f"   Error: {response.text}")
         return
     
-    # Test 4: Create Vehicle (Admin)
-    print("\n4. Creating Vehicle (Admin)...")
+    # Test 3: Create Vehicle
+    print("\n3. Creating Vehicle...")
     headers = {
-        "Authorization": f"Token {admin_token}",
+        "Authorization": f"Token {user_token}",
         "Content-Type": "application/json"
     }
     response = requests.post(f"{BASE_URL}/vehicles/", 
@@ -102,8 +78,8 @@ def test_api():
         print(f"   Error: {response.text}")
         return
     
-    # Test 5: List Vehicles
-    print("\n5. Listing Vehicles...")
+    # Test 4: List Vehicles
+    print("\n4. Listing Vehicles...")
     headers = {"Authorization": f"Token {user_token}"}
     response = requests.get(f"{BASE_URL}/vehicles/", headers=headers)
     if response.status_code == 200:
@@ -112,8 +88,8 @@ def test_api():
     else:
         print(f"❌ Vehicle listing failed: {response.status_code}")
     
-    # Test 6: Get Vehicle Details
-    print("\n6. Getting Vehicle Details...")
+    # Test 5: Get Vehicle Details
+    print("\n5. Getting Vehicle Details...")
     response = requests.get(f"{BASE_URL}/vehicles/{vehicle_id}/", headers=headers)
     if response.status_code == 200:
         vehicle = response.json()
@@ -121,26 +97,10 @@ def test_api():
     else:
         print(f"❌ Vehicle details failed: {response.status_code}")
     
-    # Test 7: Add to Wishlist
-    print("\n7. Adding to Wishlist...")
-    response = requests.post(f"{BASE_URL}/vehicles/{vehicle_id}/wishlist/toggle/", 
-                           headers=headers)
-    if response.status_code in [200, 201]:
-        print("✅ Vehicle added to wishlist")
-    else:
-        print(f"❌ Wishlist operation failed: {response.status_code}")
+    # Wishlist feature removed in this build
     
-    # Test 8: Get Wishlist
-    print("\n8. Getting User Wishlist...")
-    response = requests.get(f"{BASE_URL}/vehicles/wishlist/", headers=headers)
-    if response.status_code == 200:
-        wishlist = response.json()['results']
-        print(f"✅ Wishlist retrieved ({len(wishlist)} items)")
-    else:
-        print(f"❌ Wishlist retrieval failed: {response.status_code}")
-    
-    # Test 9: Gallery
-    print("\n9. Getting Gallery...")
+    # Test 6: Gallery
+    print("\n6. Getting Gallery...")
     response = requests.get(f"{BASE_URL}/vehicles/gallery/?limit=10", headers=headers)
     if response.status_code == 200:
         gallery = response.json()
@@ -148,8 +108,8 @@ def test_api():
     else:
         print(f"❌ Gallery retrieval failed: {response.status_code}")
     
-    # Test 10: User Profile
-    print("\n10. Getting User Profile...")
+    # Test 7: User Profile
+    print("\n7. Getting User Profile...")
     response = requests.get(f"{BASE_URL}/auth/profile/", headers=headers)
     if response.status_code == 200:
         profile = response.json()
