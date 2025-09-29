@@ -21,25 +21,13 @@ class Vehicle(models.Model):
         ('cvt', 'CVT'),
     ]
     
-    BODY_TYPE_CHOICES = [
-        ('sedan', 'Sedan'),
-        ('saloon', 'Saloon'),
-        ('hatchback', 'Hatchback'),
-        ('suv', 'SUV'),
-        ('coupe', 'Coupe'),
-        ('convertible', 'Convertible'),
-        ('wagon', 'Wagon'),
-        ('pickup', 'Pickup'),
-        ('van', 'Van'),
-    ]
-    
     title = models.CharField(max_length=200)
     year = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     fuel_type = models.CharField(max_length=20, choices=FUEL_TYPE_CHOICES)
     transmission = models.CharField(max_length=15, choices=TRANSMISSION_CHOICES)
     mileage = models.CharField(max_length=50)  # e.g., "60,000 miles"
-    body_type = models.CharField(max_length=15, choices=BODY_TYPE_CHOICES)
+    body_type = models.CharField(max_length=50)  # Users can manually enter any body type
     color = models.CharField(max_length=50)
     engine = models.CharField(max_length=100)
     description = models.TextField()
